@@ -62,10 +62,10 @@ def air_resistance(s, p=1.23, cw=0.45, d=0.24):
 class BoundaryValueProblem:
     def solve_with_euler(self, z0, a0, s0=9, x0=0, y0=1.75):
         T = 1
-        N = 16
+        N = 32
         
-        fn_x = lambda t, x: ___ / z0
-        fn_y = lambda t, y: ___ / z0
+        fn_x = lambda t, x: ( 5) / z0
+        fn_y = lambda t, y: -y**3-y**2+15*y / z0
 
         # computing x
         (_, ux) = explicit_euler(fn_x, T, N, x0)
@@ -101,12 +101,5 @@ def find_optimal_angle():
 #                           Tests                            #
 # ---------------------------------------------------------- #
 
-def test(t, y):
-    return y
-
 if __name__ == "__main__":
-    (x, y) = explicit_euler(test, 10, 100, y0)
-    plt.plot(x, y)
-    plt.show()
-
-
+    plot_ball_trajectory()
