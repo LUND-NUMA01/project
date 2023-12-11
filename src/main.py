@@ -37,15 +37,15 @@ def explicit_euler(f, T, N, y0):
     h = T / N
 
     # pre-initialize zeroed arrays
-    t = np.zeros(N + 1)
-    u = np.zeros(N + 1)
+    t = np.zeros(N)
+    u = np.zeros(N)
 
     # initial values
     t[0] = 0
     u[0] = y0
 
     # N iterations
-    for i in range(1, N + 1):
+    for i in range(1, N):
         t[i] = i * h
         u[i] = u[i-1] + h * f(t[i-1], u[i-1])
     
