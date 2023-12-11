@@ -56,16 +56,32 @@ def explicit_euler(f, T, N, y0):
 #                           Task 2                           #
 # ---------------------------------------------------------- #
 
+def air_resistance(s, p=1.23, cw=0.45, d=0.24):
+    return 0.5 * p * cw * np.pi / 4 * d**2 * s**2
+
 class BoundaryValueProblem:
-    def __init__():
-        ()
+    def solve_with_euler(self, z0, a0, s0=9, x0=0, y0=1.75):
+        T = 1
+        N = 16
+        
+        fn_x = lambda t, x: ___ / z0
+        fn_y = lambda t, y: ___ / z0
+
+        # computing x
+        (_, ux) = explicit_euler(fn_x, T, N, x0)
+
+        # computing y
+        (_, uy) = explicit_euler(fn_y, T, N, y0)
+        return (ux, uy)
 
 # ---------------------------------------------------------- #
 #                           Task 3                           #
 # ---------------------------------------------------------- #
 
 def plot_ball_trajectory():
-    return
+    x, y = BoundaryValueProblem().solve_with_euler(1, np.pi / 3)
+    plt.scatter(x, y)
+    plt.show()
 
 # ---------------------------------------------------------- #
 #                           Task 4                           #
