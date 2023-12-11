@@ -15,6 +15,8 @@ x0 = 0  # m
 y0 = 1.75 # m
 s0 = 9  # m/s
 
+z = 1
+
 def force(speed, p=1.23, cw=0.45, d=0.24):
     return 0.5 * p * cw * np.pi / 4 * d**2 * speed**2
 
@@ -52,12 +54,14 @@ for i in range(1, N):
     xacc = x_acceleration(old_angle, old_speed)
     yacc = y_acceleration(old_angle, old_speed)
 
-    vxi = states[i-1][2] + xacc * h
-    vyi = states[i-1][3] + yacc * h
+    vxi = (states[i-1][2] + xacc * h) * z
+    vyi = (states[i-1][3] + yacc * h) * z
     speed = np.sqrt(vxi**2 + vyi**2)
     ai = np.arccos(vxi / speed)
 
     states[i] = [xi, yi, vxi, vyi, ai]
+
+# ------------------------------------------------------------
 
 x = [i[0] for i in states]
 y = [i[1] for i in states]
@@ -71,7 +75,7 @@ y_fit = np.polyval(coefficients, x_fit)
 
 diffy = [abs(y[i] - y_fit[i]) for i in range(N)]
 
-# plt.plot(x, y)
+plt.plot(x, y)
 # plt.plot(x_fit, y_fit, label=f'Polynomial Fit (Degree {degree})', color='red')
-plt.plot(x, diffy)
+# plt.plot(x, diffy)
 plt.show()
