@@ -49,7 +49,7 @@ def explicit_euler(f, T, N, y0):
         t[i] = i * h
         u[i] = u[i-1] + h * f(t[i-1], u[i-1])
     
-    # return bot the arrays t_i and u_i
+    # return both the arrays t_i and u_i
     return (t, u)
 
 # ---------------------------------------------------------- #
