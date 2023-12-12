@@ -10,14 +10,16 @@ xB = 2 # m
 yB = 3.05 # m
 g = 9.81 # m/s^2
 
+B = p*cw*np.pi**d**2/8
+
 def force(s, p=1.23, cw=0.45, d=0.24):
-    return p*cw*np.pi*s**2*d**2/8
+    return B*s**2
 
 # intial conditions:
 x0 = 0  # m
 y0 = 1.75 # m
 s0 = 9  # m/s
-a0 = np.pi / 4
+a0 = 1.41
 
 T = 1
 N = 100
@@ -45,11 +47,11 @@ for i in range(1, N):
     x = old_x + old_vx * h
     y = old_y + old_vy * h
 
-    ax = -force(old_s)*np.cos(old_a)
-    ay = (-force(old_s)*np.sin(old_a) - m*g)
+    fx = -z * force(old_s) * np.cos(old_a)
+    fy = -z * (force(old_s) * np.sin(old_a) + m * g)
 
-    vx = (old_vx + ax / m * h) * z
-    vy = (old_vy + ay / m * h) * z
+    vx = (old_vx + fx / m * h) * z
+    vy = (old_vy + fy / m * h) * z
 
     s = np.sqrt(vx**2 + vy**2)
     a = np.arccos(vx / s)
@@ -61,9 +63,12 @@ for i in range(1, N):
     states[i, 4] = a
     states[i, 5] = s
 
-x = [states[i, 0] for i in range(N)]
-# x = np.linspace(0, 1, N)
-y = [states[i, 1] for i in range(N)]
+# x = [states[i, 0] for i in range(N)]
+# # x = np.linspace(0, 1, N)
+# y = [states[i, 1] for i in range(N)]
+
+x = states[:, 0]
+y = states[:, 1]
 
 print(y[-1])
 
