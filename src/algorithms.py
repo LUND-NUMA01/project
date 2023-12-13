@@ -34,7 +34,8 @@ def explicit_euler(f, T, N, y0):
 
 # -----------------------------------------------------------
 
-def newton(function, jacobian, initial_guess, tolerance=1e-2000, max_iterations=1e3):
+def newton(function, jacobian, initial_guess, tolerance=1e-5, max_iterations=1e3):
+    count  = 0
     """
     Apply the Newton-Raphson method to solve a system of nonlinear equations.
 
@@ -57,10 +58,9 @@ def newton(function, jacobian, initial_guess, tolerance=1e-2000, max_iterations=
         # Calculate the Jacobian matrix anf function value
         J = jacobian(*current_guess)
         F = function(*current_guess)
-
+        count += 1
         # Calculate the update using the inverse of the Jacobian matrix
         update = np.linalg.solve(J, -F)
-
         # Update the guess
         current_guess += update
 
@@ -68,4 +68,4 @@ def newton(function, jacobian, initial_guess, tolerance=1e-2000, max_iterations=
         if np.linalg.norm(update) < tolerance:
             break
 
-    return current_guess
+    return current_guess, count
