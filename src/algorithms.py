@@ -69,3 +69,30 @@ def newton(function, jacobian, initial_guess, tolerance=1e-2000, max_iterations=
             break
 
     return current_guess
+
+# -----------------------------------------------------------
+
+def numerical_jacobian(func, x, epsilon=1e-6):
+    """
+    Compute the numerical approximation of the Jacobian matrix of a function.
+
+    Parameters:
+    - func: Callable function for which the Jacobian is computed. It should take a NumPy array as input.
+    - x: Point at which the Jacobian is evaluated.
+    - epsilon: Perturbation value for finite differences. Default is 1e-6.
+
+    Returns:
+    - numpy.ndarray: Numerical approximation of the Jacobian matrix.
+    """
+    n = len(x)
+    m = len(func(*x))
+    J = np.zeros((m, n))
+
+    for i in range(n):
+        x_shifted = x.copy()
+        x_shifted[i] += epsilon
+
+        # assigning the entire column
+        J[:, i] = (func(*x_shifted) - func(*x)) / epsilon
+
+    return J
