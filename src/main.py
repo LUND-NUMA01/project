@@ -94,4 +94,7 @@ def find_optimal_angle():
 # ---------------------------------------------------------- #
 
 if __name__ == "__main__":
-    plot_ball_trajectory()
+    (x, y) = explicit_euler(test, 10, 100, y0)
+    plt.plot(x, y)
+    plt.show()
+
