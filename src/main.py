@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from algorithms import explicit_euler, newton
+from algorithms import explicit_euler, newton, numerical_jacobian
 
 # some facts:
 d = 0.24 # m
@@ -11,11 +11,6 @@ p = 1.23 # kg/m^3
 xB = 2 # m
 yB = 3.05 # m
 g = 9.81 # m/s^2
-
-# intial conditions:
-x0 = 0  # m
-y0 = 1.75 # m
-s0 = 9  # m/s
 
 # constant combining all other constants for
 # the air resistance and acceleration
@@ -73,6 +68,7 @@ def plot_ball_trajectory():
 #                           Task 5                           #
 # ---------------------------------------------------------- #
 
+# this function is `G(z0, a0)`
 def function(p, q):
     x, y = solve_with_euler(p, q)
     return np.array([x[-1] - xB, y[-1] - yB])
@@ -103,7 +99,7 @@ def find_optimal_angle(z_0, a_0, max_iter=1.e3):  # initial guesses
     return newton(function, jacobian, [z_0, a_0], max_iterations=max_iter)
 
 
-def plot_intermediate_trajectory(z_0, a_0):
+def plot_intermediate_trajectory(z_0, a_0, x0, y0, xB,yB):
     [z, a], set_interations = find_optimal_angle(z_0, a_0) # determines how many intermediate trajectories we should plot
     # z0 = 1 # initial guess, an idea for the reader
     # a0 = 1.5 
