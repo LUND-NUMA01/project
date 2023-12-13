@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from algorithms import explicit_euler, nonlinear_newton
+from algorithms import explicit_euler, newton
 
 # some facts:
 d = 0.24 # m
@@ -75,23 +75,51 @@ def plot_ball_trajectory():
 
 def function(p, q):
     x, y = solve_with_euler(p, q)
-    return [x[-1] - xB, y[-1] - yB]
+    return np.array([x[-1] - xB, y[-1] - yB])
 
-def jacobian(p, q):
-    return
+def numerical_jacobian(func, x, epsilon=1e-6):
+    """
+    Compute the numerical approximation of the Jacobian matrix of a function.
+
+    Parameters:
+    - func: Callable function for which the Jacobian is computed. It should take a NumPy array as input.
+    - x: Point at which the Jacobian is evaluated.
+    - epsilon: Perturbation value for finite differences. Default is 1e-6.
+
+    Returns:
+    - numpy.ndarray: Numerical approximation of the Jacobian matrix.
+    """
+    n = len(x)
+    m = len(func(*x))
+    J = np.zeros((m, n))
+
+    # print(f'n: {n}, m: {m}')
+    # print(f'initial guess: {x}')
+
+    # print(f'test: {func(*x)}')
+
+    for i in range(n):
+        x_perturbed = x.copy()
+        x_perturbed[i] += epsilon
+
+        J[:, i] = (func(*x_perturbed) - func(*x)) / epsilon
+
+    return J
 
 def find_optimal_angle():
     # initial guesses
     z0 = 0.5
     a0 = 1
 
-    return nonlinear_newton(function, jacobian, [z0, a0])
+    jacobian = lambda x, y: numerical_jacobian(function, [x, y])
+
+    return newton(function, jacobian, [z0, a0])
 
 # ---------------------------------------------------------- #
 #                           Tests                            #
 # ---------------------------------------------------------- #
 
 if __name__ == "__main__":
-    plot_ball_trajectory()
-    # z, a = find_optimal_angle()
-    # print(f'time: {1/z}, angle: {a}')
+    # plot_ball_trajectory()
+    z, a = find_optimal_angle()
+    print(f'time: {1/z}, angle: {a}')

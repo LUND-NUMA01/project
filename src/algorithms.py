@@ -34,7 +34,7 @@ def explicit_euler(f, T, N, y0):
 
 # -----------------------------------------------------------
 
-def newton(function, jacobian, initial_guess, tolerance=1e-20, max_iterations=1e3):
+def newton(function, jacobian, initial_guess, tolerance=1e-2000, max_iterations=1e3):
     """
     Apply the Newton-Raphson method to solve a system of nonlinear equations.
 
