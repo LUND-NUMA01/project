@@ -134,4 +134,4 @@ if __name__ == "__main__":
     # plot_ball_trajectory()
     #[z, a], count = find_optimal_angle()
     #print(f'time: {1/z}, angle: {a}, iterations: {count}')
-    plot_intermediate_trajectory(0.4, 1.05)
+    plot_intermediate_trajectory(0.4, 0.75, 0, 1.75, 2, 3.05)
