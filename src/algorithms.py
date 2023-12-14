@@ -39,11 +39,11 @@ def newton(function, jacobian, initial_guess, tolerance=1e-5, max_iter=1e3):
     current_guess = np.array(initial_guess, dtype=float)
 
     for i in range(int(max_iter)):
-        # Calculate the Jacobian matrix anf function value
+        # Calculate the Jacobian matrix and function value
         J = jacobian(*current_guess)
         F = function(*current_guess)
 
-        # Calculate the update
+        # Calculate the update (Jx=F -> x=J^-1F ~> x=F/J)
         update = np.linalg.solve(J, F)
 
         # Update the guess
