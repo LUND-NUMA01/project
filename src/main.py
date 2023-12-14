@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from typing import Literal
 from algorithms import explicit_euler, newton, numerical_jacobian, adams_bashforth
 
 class Basketball:
@@ -16,26 +17,44 @@ class Basketball:
         self.p = p
         self.g = g
 
-    # TODO: add option to change algorithm (euler, adams-bashforth, ...)
-    def approx_postion(self, z, a):
+    def approx_postion(self, z, a, algorithm: Literal['euler','adams']='euler'):
         T = 1
         N = 64
-        
+
+        match algorithm:
+            case 'euler': fn_algorithm = explicit_euler
+            case 'adams': fn_algorithm = adams_bashforth
+            case _: raise TypeError(f"unknown algorithm: {algorithm}")
+
         # compute initial x,y velocities
         vx0 = self.s0 * np.cos(a)
         vy0 = self.s0 * np.sin(a)
 
+        # constant function z(tau)
         z_t = 1/z
+
         # create array for the initial values
         initial_values = np.array([self.x0, self.y0, vx0, vy0])
 
+        # constant combining all other constants for the air
+        # resistance and acceleration to reduce computations
         C = -0.5*self.p*self.cw*np.pi/4*self.d**2/self.m
-        
-        def func(_, u):
-            # u[0] = x-position
-            # u[1] = y-position
-            # u[2] = x-velocity
-            # u[3] = y-velocity
+
+        def derivative(_, u):
+            """
+            The derivative of the function
+
+            Parameters:
+            - _: the t value is ignored
+            - u[0]: x-position
+            - u[1]: y-position
+            - u[2]: x-velocity
+            - u[3]: y-velocity
+
+            Returns:
+            - the derivates of the positions (velocities) and
+              the velocities (acceleration) as a numpy array
+            """
             s = np.sqrt(u[2]**2 + u[3]**2)
             ax = C * s * u[2] * z_t**2
             ay = C * s * u[3] * z_t**2 - self.g
@@ -43,8 +62,10 @@ class Basketball:
             vy = u[3] * z_t
             return np.array([vx, vy, ax, ay])
 
-        _, u = explicit_euler(func, T, N, initial_values)
-        # _, u = adams_bashforth(func, T, N, initial_values)
+        # approximate the positions and velocities
+        # u is an array of length N with arrays of
+        # length 4 as elements (positions + velocities)
+        _, u = fn_algorithm(derivative, T, N, initial_values)
 
         # extract x and y values from u
         x = np.zeros(N)
@@ -56,40 +77,47 @@ class Basketball:
 
         # return x and y values
         return x, y
-    
-    def approx_optimal_angle(self, z0, a0, max_iter=1.e3):
+
+    def approx_optimal_angle(self, z0, a0, algorithm='euler', max_iter=1.e3):
+        # This is the function G(z0, a0)
         def function(p, q):
-            x, y = self.approx_postion(p, q)
-            return np.array([x[-1] - self.xB, y[-1] - self.yB]) 
+            x, y = self.approx_postion(p, q, algorithm=algorithm)
+            return np.array([x[-1] - self.xB, y[-1] - self.yB])
         jacobian = lambda x, y: numerical_jacobian(function, [x, y])
         return newton(function, jacobian, [z0, a0], max_iter=max_iter)
-    
-    def plot_trajectory(self, z, a):
-        x, y = self.approx_postion(z, a)
+
+    def plot_trajectory(self, z, a, algorithm='euler'):
+        """
+        this function just plots the approximated
+        positions for the given z and a values
+        """
+        x, y = self.approx_postion(z, a, algorithm=algorithm)
+        plt.scatter(self.xB, self.yB, s=40, label="Final position") # point where the hoop is
+        plt.scatter(self.x0, self.y0, s=40, color="Black", label="Starting position") # ball starting position
         plt.xlim([0, 2.5])
         plt.plot(x, y)
         return plt.show()
-    
-    def plot_intermediate_trajectories(self, z, a):
+
+    def plot_intermediate_trajectories(self, z, a, algorithm='euler'):
         # determines how many intermediate trajectories we should plot
-        _, set_iterations = self.approx_optimal_angle(z, a)
+        _, set_iterations = self.approx_optimal_angle(z, a, algorithm=algorithm)
         iter_z = z
         iter_a = a
-        x, y = self.approx_postion(iter_z, iter_a)
+        x, y = self.approx_postion(iter_z, iter_a, algorithm=algorithm)
         plt.figure(figsize=(6,6))
-        plt.plot(x,y, color="black", label="The initial guess trajectory" )
+        plt.plot(x, y, color="black", label="The initial guess trajectory" )
 
         for i in range(set_iterations-1):
-            [iter_z, iter_a], _ = self.approx_optimal_angle(iter_z, iter_a, 1)
-            x, y = self.approx_postion(iter_z, iter_a)
+            [iter_z, iter_a], _ = self.approx_optimal_angle(iter_z, iter_a, algorithm=algorithm, max_iter=1)
+            x, y = self.approx_postion(iter_z, iter_a, algorithm=algorithm)
             plt.plot(x,y, label=f"Intermediate trajectory by Newton method iteration number: {i+1}")
 
-        [iter_z, iter_a], _ = self.approx_optimal_angle(iter_z, iter_a, 1)
-        x, y = self.approx_postion(iter_z, iter_a)
+        [iter_z, iter_a], _ = self.approx_optimal_angle(iter_z, iter_a, algorithm=algorithm, max_iter=1)
+        x, y = self.approx_postion(iter_z, iter_a, algorithm=algorithm)
         plt.plot(x,y, label=f"Final trajectory. Time taken: {iter_z:.2f}s, Angle: {iter_a/np.pi*180:.2f}˚, Final iteration number: {set_iterations}")
 
-        plt.scatter(self.xB,self.yB, s= 40, label="Final position") # point where the hoop is
-        plt.scatter(self.x0, self.y0, s =40, color="Black", label="Starting position")# ball starting position
+        plt.scatter(self.xB, self.yB, s=40, label="Final position") # point where the hoop is
+        plt.scatter(self.x0, self.y0, s=40, color="Black", label="Starting position") # ball starting position
         plt.xlabel("The horizontal distance in meters between the ball player and the hoop")
         plt.ylabel("The verticle distance in meters between the ball and the hoop")
         plt.title("Final and intermediate trajectory of the basketball")
@@ -100,4 +128,6 @@ class Basketball:
 
 if __name__ == "__main__":
     ball = Basketball(0, 1.75, 2, 3.05, 9)
-    ball.plot_intermediate_trajectories(2, 1.4)
+    ball.plot_trajectory(2, 1.2, algorithm='euler')
+    ball.plot_trajectory(2, 1.2, algorithm='adams')
+    ball.plot_intermediate_trajectories(2, 1.4, algorithm='euler')
