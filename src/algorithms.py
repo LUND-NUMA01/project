@@ -35,23 +35,23 @@ def explicit_euler(f, T, N, y0):
 # -----------------------------------------------------------
 
 def newton(function, jacobian, initial_guess, tolerance=1e-5, max_iter=1e3):
-    count  = 0
+    count = max_iter
     current_guess = np.array(initial_guess, dtype=float)
 
-    for _ in range(int(max_iter)):
+    for i in range(int(max_iter)):
         # Calculate the Jacobian matrix anf function value
         J = jacobian(*current_guess)
         F = function(*current_guess)
-        
+
         # Calculate the update
-        update = np.linalg.solve(J, -F)
+        update = np.linalg.solve(J, F)
 
         # Update the guess
-        current_guess += update
-
-        count += 1
+        current_guess -= update
+        
         # Check for convergence
         if np.linalg.norm(update) < tolerance:
+            count = i
             break
 
     return current_guess, count
