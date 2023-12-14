@@ -96,3 +96,39 @@ def numerical_jacobian(func, x, epsilon=1e-6):
         J[:, i] = (func(*x_shifted) - func(*x)) / epsilon
 
     return J
+
+
+
+def adams_bashforth(f, T, N, y0):
+    """
+    Solve the ODE using the Adams-Bashforth method over t ∈ [0, T] using N steps.
+
+    Parameters:
+        - f: The function representing the derivative dy/dt.
+        - T: The endpoint of the interval
+        - N: The number of iterations
+        - y0: The initial value
+
+    Returns:
+        - t: List of time points.
+        - u: List of corresponding approximated y values.
+    """
+    # pre-initialize zeroed arrays
+    t = np.linspace(0, T, N)
+    u = np.zeros(N, dtype=object)
+
+    #retrieval of value of first index
+    temp_t, temp_u = explicit_euler(f, T, N, y0)
+    u[1] = temp_u[1]
+
+    # initial values
+    u[0] = y0
+
+    # step size
+    h = t[1] - t[0]
+
+    # Adams-Bashforth iterations
+    for i in range(0, N-2):
+        u[i+2] = u[i+1] + 1.5*h * f(t[i+1], u[i+1]) - 0.5*h * f(t[i], u[i])
+    # return both the arrays t_i and u_i
+    return (t, u)
