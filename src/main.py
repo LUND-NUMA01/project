@@ -22,7 +22,9 @@ yB = 3.05 # final y position [m]
 
 def approx_positions(z0, a0, s0=9, x0=0, y0=1.75):
     T = 1
-    N = 128
+    N = 32
+
+    z_t = 1 / z0
 
     # compute initial x,y velocities
     vx0 = s0 * np.cos(a0)
@@ -57,10 +59,10 @@ def approx_positions(z0, a0, s0=9, x0=0, y0=1.75):
           the velocities (acceleration) as an numpy array
         """
         s = np.sqrt(u[2]**2 + u[3]**2)
-        ax = C * s * u[2] * z0**2
-        ay = C * s * u[3] * z0**2 - g
-        vx = u[2] * z0
-        vy = u[3] * z0
+        ax = C * s * u[2] * z_t**2
+        ay = C * s * u[3] * z_t**2 - g
+        vx = u[2] * z_t
+        vy = u[3] * z_t
         return np.array([vx, vy, ax, ay])
 
     # approximate the positions and velocities
@@ -123,7 +125,7 @@ def plot_intermediate_trajectory(z_0, a_0, x0, y0, xB, yB):
     tolerance can be adjusted for fewer graphs of good enough approximation.
     """
     # determine how many intermediate trajectories we should plot
-    _, set_interations = approx_optimal_angle(z_0, a_0)
+    _, set_interations = approx_optimal_angle(z_0, a_0, max_iter=1000)
 
     iter_z = z_0
     iter_a = a_0
@@ -131,10 +133,10 @@ def plot_intermediate_trajectory(z_0, a_0, x0, y0, xB, yB):
     plt.figure(figsize=(6,6))
     plt.plot(x, y, color="black", label=f"The initial guess trajectory (z={z_0}, a={a_0})" )
 
-    for i in range(1, set_interations + 1):
-        [iter_z, iter_a], _ = approx_optimal_angle(iter_z, iter_a, i)
+    for i in range(set_interations):
+        [iter_z, iter_a], _ = approx_optimal_angle(iter_z, iter_a, 1)
         x, y = approx_positions(iter_z, iter_a)
-        plt.plot(x,y, label=f"Intermediate trajectory by Newton method iteration number: {i}")
+        plt.plot(x,y, label=f"Intermediate trajectory by Newton method iteration number: {i+1}")
 
     plt.scatter(xB, yB, s=40, label="Final position") # point where the hoop is
     plt.scatter(x0, y0, s=40, color="Black", label="Starting position")# ball starting position
@@ -150,6 +152,7 @@ def plot_intermediate_trajectory(z_0, a_0, x0, y0, xB, yB):
 
 if __name__ == "__main__":
     # plot_ball_trajectory()
-    #[z, a], count = find_optimal_angle()
-    #print(f'time: {1/z}, angle: {a}, iterations: {count}')
-    plot_intermediate_trajectory(1, 1.4, x0, y0, xB, yB)
+    # [z, a], count = approx_optimal_angle(2, 1.4)
+    # print(f'time: {z}, angle: {a}, iterations: {count}')
+    plot_intermediate_trajectory(2, 1.4, x0, y0, xB, yB)
+    # _, set_interations = approx_optimal_angle(1, 1.4, max_iter=2)
