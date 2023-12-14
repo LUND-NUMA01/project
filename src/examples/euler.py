@@ -8,7 +8,7 @@ N = 24
 
 func = lambda t, u: -u*np.cos(t)
 
-(t, u) = explicit_euler(func, T, N, 1)
+t, u = explicit_euler(func, T, N, 1)
 
 plt.scatter(t, u)
 plt.show()

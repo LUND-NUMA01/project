@@ -1,32 +1,29 @@
 import numpy as np
+import unittest
 
-from algorithms import newton
+from algorithms import explicit_euler, newton, numerical_jacobian
 
-def function(x, y, z):
-    return np.array([x+y+z-3, (x**2)+(y**2)+(z**2)-5, (np.exp(x))+(x*y)-(x*z)-1])
+class TestExplicitEulerMethod(unittest.TestCase):
+    pass
 
-def jacobian(x, y, z):
-    return np.array([[1, 1, 1], [2*x, 2*y, 2*z], [np.exp(x), x, -x]])
+class TestNewtonMethod(unittest.TestCase):
+    pass
 
-print(newton(function, jacobian, [1, 2, 3]))
+class TestJacobian(unittest.TestCase):
+    pass
 
-def function(x, y):
-    return np.array([x+2*y-2,x**2+4*y**2-4])
+if __name__ == "__main__":
+    unittest.main()
 
-def jacobian(x, y):
-    return np.array([[1,2],[2*x,8*y]])
+# from scipy.optimize import fsolve
+# def function(xy):
+#     x, y = xy
+#     return np.array([x+2*y-2,x**2+4*y**2-4])
 
-print(newton(function, jacobian, [1, 2]))
+# def jacobian(xy):
+#     x, y = xy
+#     return np.array([[1,2],[2*x,8*y]])
 
-from scipy.optimize import fsolve
-def function(xy):
-    x, y = xy
-    return np.array([x+2*y-2,x**2+4*y**2-4])
-
-def jacobian(xy):
-    x, y = xy
-    return np.array([[1,2],[2*x,8*y]])
-
-x0 = [1, 2]
-sol = fsolve(function, x0, fprime=jacobian, full_output=1)
-print('solution exercice fsolve:', sol)
+# x0 = [1, 2]
+# sol = fsolve(function, x0, fprime=jacobian, full_output=1)
+# print('solution exercice fsolve:', sol)

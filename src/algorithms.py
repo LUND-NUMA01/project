@@ -34,38 +34,24 @@ def explicit_euler(f, T, N, y0):
 
 # -----------------------------------------------------------
 
-def newton(function, jacobian, initial_guess, tolerance=1e-5, max_iterations=1e3):
-    count  = 0
-    """
-    Apply the Newton-Raphson method to solve a system of nonlinear equations.
-
-    Parameters:
-    - function: Callable function representing the system of equations. It takes the current guess as arguments.
-    - jacobian: Callable function representing the Jacobian matrix of the system. It also takes the current guess as arguments.
-    - initial_guess: Initial guess for the solution (list).
-    - tolerance: Convergence criterion, the method stops when the update is smaller than this value. Default is 1e-20.
-    - max_iterations: Maximum number of iterations. Default is 1e3.
-
-    Returns:
-    - numpy.ndarray: The solution to the system of equations.
-    
-    Note:
-    The functions 'function' and 'jacobian' should be defined to take the current guess as arguments and return NumPy arrays.
-    """
+def newton(function, jacobian, initial_guess, tolerance=1e-5, max_iter=1e3):
+    count = max_iter
     current_guess = np.array(initial_guess, dtype=float)
 
-    for _ in range(int(max_iterations)):
+    for i in range(int(max_iter)):
         # Calculate the Jacobian matrix anf function value
         J = jacobian(*current_guess)
         F = function(*current_guess)
-        count += 1
-        # Calculate the update using the inverse of the Jacobian matrix
-        update = np.linalg.solve(J, -F)
-        # Update the guess
-        current_guess += update
 
+        # Calculate the update
+        update = np.linalg.solve(J, F)
+
+        # Update the guess
+        current_guess -= update
+        
         # Check for convergence
         if np.linalg.norm(update) < tolerance:
+            count = i
             break
 
     return current_guess, count
@@ -73,31 +59,20 @@ def newton(function, jacobian, initial_guess, tolerance=1e-5, max_iterations=1e3
 # -----------------------------------------------------------
 
 def numerical_jacobian(func, x, epsilon=1e-6):
-    """
-    Compute the numerical approximation of the Jacobian matrix of a function.
-
-    Parameters:
-    - func: Callable function for which the Jacobian is computed. It should take a NumPy array as input.
-    - x: Point at which the Jacobian is evaluated.
-    - epsilon: Perturbation value for finite differences. Default is 1e-6.
-
-    Returns:
-    - numpy.ndarray: Numerical approximation of the Jacobian matrix.
-    """
     n = len(x)
     m = len(func(*x))
-    J = np.zeros((m, n))
+    j = np.zeros((m, n))
 
     for i in range(n):
         x_shifted = x.copy()
         x_shifted[i] += epsilon
 
         # assigning the entire column
-        J[:, i] = (func(*x_shifted) - func(*x)) / epsilon
+        j[:, i] = (func(*x_shifted) - func(*x)) / epsilon
 
-    return J
+    return j
 
-
+# -----------------------------------------------------------
 
 def adams_bashforth(f, T, N, y0):
     """
