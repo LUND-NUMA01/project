@@ -4,6 +4,12 @@ import matplotlib.pyplot as plt
 from typing import Literal
 from algorithms import explicit_euler, newton, numerical_jacobian, adams_bashforth
 
+class someerror(Exception):
+    def __init__(self, expr):
+        self.expr = expr
+    def __str__(self):
+        return str(self.expr)
+
 class Basketball:
     def __init__(self, x0, y0, xB, yB, s0, d=0.24, m=0.6, cw=0.45, p=1.23, g=9.81):
         self.x0 = x0
@@ -16,6 +22,9 @@ class Basketball:
         self.cw = cw
         self.p = p
         self.g = g
+        attributes_array = np.array([x0, y0, xB, yB, s0, d, m, cw, p, g])
+        if np.any((attributes_array < 0) == True):
+            raise ValueError("Represented physical attributes can only be of type int or float and cannot be negative!")
 
     def approx_postion(self, z, a, algorithm: Literal['euler','adams']='euler'):
         T = 1
@@ -53,7 +62,7 @@ class Basketball:
 
             Returns:
             - the derivates of the positions (velocities) and
-              the velocities (acceleration) as a numpy array
+                the velocities (acceleration) as a numpy array
             """
             s = np.sqrt(u[2]**2 + u[3]**2)
             ax = C * s * u[2] * z_t**2
@@ -127,7 +136,7 @@ class Basketball:
         return plt.show() # tolerance can be adjusted for fewer graphs of good enough approximation.
 
 if __name__ == "__main__":
-    ball = Basketball(0, 1.75, 2, 3.05, 9)
+    ball = Basketball(0, 1.75, 3, 3.05, 10)
     ball.plot_trajectory(2, 1.2, algorithm='euler')
     ball.plot_trajectory(2, 1.2, algorithm='adams')
     ball.plot_intermediate_trajectories(2, 1.4, algorithm='euler')
