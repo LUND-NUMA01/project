@@ -4,12 +4,6 @@ import matplotlib.pyplot as plt
 from typing import Literal
 from algorithms import explicit_euler, newton, numerical_jacobian, adams_bashforth
 
-class someerror(Exception):
-    def __init__(self, expr):
-        self.expr = expr
-    def __str__(self):
-        return str(self.expr)
-
 class Basketball:
     def __init__(self, x0, y0, xB, yB, s0, d=0.24, m=0.6, cw=0.45, p=1.23, g=9.81):
         self.x0 = x0
@@ -23,7 +17,7 @@ class Basketball:
         self.p = p
         self.g = g
         attributes_array = np.array([x0, y0, xB, yB, s0, d, m, cw, p, g])
-        if np.any((attributes_array < 0) == True):
+        if np.any((attributes_array < 0)):
             raise ValueError("Represented physical attributes can only be of type int or float and cannot be negative!")
 
     def approx_postion(self, z, a, algorithm: Literal['euler','adams']='euler'):
