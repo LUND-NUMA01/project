@@ -1,15 +1,7 @@
 import numpy as np
 import unittest
 
-from algorithms import explicit_euler, newton, numerical_jacobian
-
-# class TestExplicitEulerMethod(unittest.TestCase):
-#     pass
-
-# class TestJacobian(unittest.TestCase):
-#     pass
-
-# ----------------------------------------------------
+from algorithms import newton
 
 class TestNewtonMethod(unittest.TestCase):
     def test_linear_system(self):
@@ -30,12 +22,10 @@ class TestNewtonMethod(unittest.TestCase):
 
         # Assert the result is close to the actual solution (2/3, 7/3)
         expected_solution = np.array([2/3, 7/3])
-
         self.assertTrue(np.allclose(result, expected_solution))
 
     def test_nonlinear_system(self):
         # Nonlinear system: f1(x, y) = x^2 + y^2 - 5, f2(x, y) = xy - 1
-
         def nonlinear_system(x, y):
             return np.array([x**2 + y**2 - 5, x * y - 1])
 
@@ -43,10 +33,7 @@ class TestNewtonMethod(unittest.TestCase):
         def nonlinear_jacobian(x, y):
             return np.array([[2 * x, 2 * y], [y, x]])
 
-        # Initial guess
         initial_guess = np.array([2.0, 1.0])
-
-        # Use Newton method
         result, _ = newton(nonlinear_system, nonlinear_jacobian, initial_guess)
 
         expected_solution = np.array([2.189, 0.457])
@@ -65,30 +52,12 @@ class TestNewtonMethod(unittest.TestCase):
             # return np.shape((2, 2), 1, 1, 2*x, 2*y)
             return np.array([[1, 1], [2 * x, 2 * y]])
 
-        # Initial guess
         initial_guess = [3.0, 1.0]
-
-        # Use Newton method
         result, _ = newton(system_of_equations, jacobian_matrix, initial_guess)
-
 
         # Assert the result is close to the actual solution (2, 1)
         expected_solution = np.array([2, 1])
         self.assertTrue(np.allclose(result, expected_solution))
 
-
 if __name__ == '__main__':
     unittest.main()
-
-# from scipy.optimize import fsolve
-# def function(xy):
-#     x, y = xy
-#     return np.array([x+2*y-2,x**2+4*y**2-4])
-
-# def jacobian(xy):
-#     x, y = xy
-#     return np.array([[1,2],[2*x,8*y]])
-
-# x0 = [1, 2]
-# sol = fsolve(function, x0, fprime=jacobian, full_output=1)
-# print('solution exercice fsolve:', sol)
